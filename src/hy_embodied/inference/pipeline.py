@@ -14,7 +14,7 @@ Example::
     out = pipe.generate(
         image="demo.jpg",
         prompt="Describe this image.",
-        enable_thinking=True,
+        enable_thinking=False,
     )
     print(out)
 """
@@ -56,7 +56,7 @@ class GenerationConfig:
     max_new_tokens: int = 32768
     temperature: float = 0.05
     use_cache: bool = True
-    enable_thinking: bool = True
+    enable_thinking: bool = False
 
 
 class HyEmbodiedPipeline:
