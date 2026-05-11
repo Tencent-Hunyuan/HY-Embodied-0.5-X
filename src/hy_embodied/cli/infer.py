@@ -2,9 +2,13 @@
 
 Usage::
 
-    # Single-image
+    # Single-image (thinking disabled by default)
     python -m hy_embodied.cli.infer \\
         --model ckpts/HY-Embodied-0.5-X --image demo.jpg --prompt "Describe this image"
+
+    # Single-image with thinking enabled
+    python -m hy_embodied.cli.infer \\
+        --model ckpts/HY-Embodied-0.5-X --image demo.jpg --prompt "Describe this image" --enable-thinking
 
     # Batch demo (two samples, one with image, one text-only)
     python -m hy_embodied.cli.infer --model ckpts/HY-Embodied-0.5-X --image demo.jpg --batch
@@ -47,8 +51,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt", type=str, default="Describe the image in detail.")
     parser.add_argument("--temperature", type=float, default=0.05)
     parser.add_argument("--max-new-tokens", type=int, default=32768)
-    parser.add_argument("--enable-thinking", action="store_true", default=True)
-    parser.add_argument("--no-thinking", dest="enable_thinking", action="store_false")
+    parser.add_argument("--enable-thinking", action="store_true", help="Enable thinking (CoT) mode")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--batch", action="store_true", help="Run the batch inference demo")
     return parser.parse_args()
