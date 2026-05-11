@@ -15,9 +15,9 @@
 
 ---
 
-**HY-Embodied-0.5-X** 是腾讯 Robotics X 联合混元团队发布并开源的面向具身任务落地的多模态大模型。模型基于 `HY-Embodied-0.5 MoT-2B` 架构打造（总参数 4B，激活 2B），围绕机器人在真实环境中 **"看得懂、想得清、做得到"** 的关键链路进行专项优化，在 **10 个主流具身复杂任务规划评测集** 上达到业内先进水平，其中 **7 个评测集位于端侧领域模型第一名**。
+**HY-Embodied-0.5-X** 是腾讯 Robotics X 联合混元团队发布并开源的面向具身任务落地的多模态大模型。模型基于 `HY-Embodied-0.5 MoT-2B` 架构打造（总参数 4B，仅激活 2B），特别针对真实机器人的核心闭环 —— **"感知、推理、决策"** —— 进行优化。
 
-相比通用多模态模型，HY-Embodied-0.5-X 更聚焦机器人在真实交互中的核心问题，重点增强了 **精细操作理解、空间推理、动作预测、风险判断、多模态指代理解和长程规划** 等能力，推动模型从 "看懂" 进一步走向 "干活"。
+模型在 **10 个主流具身任务规划 benchmark** 上达到业界领先水平，其中 **7 个 benchmark 排名第一**（限于边缘侧领域模型）。相比通用多模态模型，HY-Embodied-0.5-X 更聚焦机器人在真实交互中的核心问题，重点增强了 **精细操作理解、空间推理、动作预测、风险判断、多模态指代理解和长程规划** —— 将模型从 *"看"* 推进到 *"做"*。
 
 ## 🔥 Updates
 
@@ -34,17 +34,17 @@
 
 ### 一、丰富可靠的数据组成
 
-HY-Embodied-0.5-X 融合了 **自采机器人第一视角操作数据、机械臂操作数据以及开源具身数据**，构建了覆盖操作理解、第一人称任务推理、多模态交互指代理解等关键场景的高质量训练数据：
+HY-Embodied-0.5-X 融合了 **自采机器人第一视角操作数据、机械臂操作数据以及开源具身数据**，构建了覆盖操作理解、第一人称任务推理、多模态交互指代的高质量数据库：
 
 - **机械臂 / 人手操作轨迹**：围绕状态理解、下一步动作预测、操作风险判断、失败诊断和候选动作优劣比较等任务进行专项构建。
 - **第一视角具身任务**：覆盖细粒度动作识别、子任务进度判断、手部空间定位、深度估计、相对空间关系推理、相机位姿推断等多类能力。
-- **多模态交互指代理解**：围绕 “把这个放到那里” 这类真实协作场景中的模糊指令，结合语音与手势构建训练数据。
+- **多模态交互指代理解**：围绕 "把这个放到那里" 这类真实协作场景中的模糊指令，结合语音与手势构建训练数据。
 
-所有核心数据均附带 **思维链（CoT）标注**，配套 “生成—校验—修正—评测反跑验证” 的完整数据质量闭环。同时将具身、互联网及 3D 数据纳入统一体系，构建标准化的数据重构流水线，将异构源数据转化为统一的高质量具身推理数据。
+所有核心数据均附带 **思维链（CoT）标注**，配套 "生成—校验—修正—评测反跑验证" 的完整数据质量闭环。同时将具身、互联网及 3D 数据纳入统一的标准化重建管道，使异质数据源转化为一致、高质的具身推理数据。
 
 ### 二、验证—扩展—全量的分阶段训练策略
 
-训练上，模型采用 **“验证—扩展—全量”** 的分阶段迭代策略：
+训练上，模型采用 **"验证—扩展—全量"** 的分阶段迭代策略：
 
 1. 先通过精选小规模高质量数据快速验证训练配置与数据清洗效果；
 2. 逐步扩大训练规模；
@@ -72,23 +72,19 @@ HY-Embodied-0.5-X 融合了 **自采机器人第一视角操作数据、机械�
 
 ### AI2Thor 具身规划基准
 
-我们自建了基于 AI2Thor 仿真环境的具身规划基准，共包含 **1011 道任务**，覆盖厨房、卧室、客厅、浴室四大家居场景，考察导航、抓取、放置、开关电器、切割食材等操作的规划与执行表现。HY-Embodied-0.5-X 在长程操作、自认知、空间理解等关键维度上取得了明显提升：
+我们自建了基于 AI2Thor 仿真环境的具身规划基准，共包含 **1011 道任务**，覆盖厨房、卧室、客厅、浴室四大家居场景，考察导航、抓取、放置、开关操作和食物切割等能力。HY-Embodied-0.5-X 在长程操作、自我意识和空间理解上展现出明显优势：
 
 <p align="center">
   <img src="./assets/Results-Planning-benchmark.png" width="90%" />
 </p>
 
-从基准中选取的四个代表性任务（厨房切菜装盘、制作冰咖啡、玄关整理、卧室贵重品收纳）的标准动作序列均在仿真环境中成功执行，涵盖导航、抓取、放置、开关、切割、等待等多种操作，展现了模型在真实家居场景下完成复杂多步任务的规划与执行能力。
-
 ### PlaygroundX 仿真接入
 
-HY-Embodied-0.5-X 在基于 Tairos 平台的 **PlaygroundX 仿真架构** 上完成接入验证，可在 “把土豆扔到垃圾桶里”“关上冰箱门”“把西红柿放进冰箱” 等典型居家任务中生成完整规划，并在执行过程中结合环境反馈进行调整。
-
-尤其在 “把西红柿放进冰箱” 任务中，模型在初始规划未考虑冰箱门状态的情况下，能够基于执行失败反馈 **快速完成重规划**，补充 “开门—放置” 等动作，形成一次完整的 **ReAct 闭环**：推理、执行、感知失败、再规划。
+HY-Embodied-0.5-X 在基于 Tairos 平台的 **PlaygroundX 仿真架构** 上完成接入验证，可在 "把土豆扔到垃圾桶里""关上冰箱门""把西红柿放进冰箱" 等典型家居任务中生成完整规划，并根据环境反馈动态调整执行策略 —— 形成完整的 **ReAct 闭环**：感知 → 规划 → 执行 → 失败检测 → 重规划。
 
 ## 🛠️ 环境安装
 
-仓库提供一键 conda 环境配置脚本 `setup_env.sh`，会自动完成 Python 3.12 环境创建、PyTorch / flash_attn / transformers（原生支持 HY-Embodied 的版本）及其他依赖的安装（flash_attn 源码编译约需 10–20 分钟）：
+仓库提供一键 conda 环境配置脚本 `setup_env.sh`，会自动完成 Python 3.12 环境创建、PyTorch / flash_attn / transformers（原生支持 HY-Embodied 的版本）及其他依赖的安装。`flash_attn` 需要从源码编译，耗时约 10–20 分钟：
 
 ```bash
 bash setup_env.sh
@@ -108,7 +104,8 @@ pip install -e .
 | PyTorch | 2.10.0                       |
 | GPU     | NVIDIA GPU with ≥ 16 GB VRAM |
 
-> 核心依赖：`transformers`（[指定 commit](https://github.com/huggingface/transformers/commit/9293856c419762ebf98fbe2bd9440f9ce7069f1a)，原生支持 HY-Embodied）、`flash_attn==2.8.3`、`accelerate`、`deepspeed`、`timm`、`liger-kernel`。完整清单见 `setup_env.sh` 与 `requirements.txt`。
+> 核心依赖：`transformers`（[指定 commit](https://github.com/huggingface/transformers/commit/9293856c419762ebf98fbe2bd9440f9ce7069f1a)，原生支持 HY-Embodied）、`flash_attn==2.8.3`、`accelerate`、`deepspeed`、`timm`、`liger-kernel`。
+> 完整依赖清单见 `setup_env.sh` 和 `requirements.txt`。
 
 ## 📥 下载权重
 
@@ -124,17 +121,18 @@ hf download tencent/HY-Embodied-0.5-X \
 ### 单图推理
 
 ```bash
+# 默认：thinking 模式关闭
 python -m hy_embodied.cli.infer \
     --model ckpts/HY-Embodied-0.5-X \
     --image ./assets/demo.jpg \
-    --prompt "Describe this image"
+    --prompt "描述这张图片"
 
-# 关闭 thinking 模式
+# 启用 thinking 模式（思维链推理）
 python -m hy_embodied.cli.infer \
     --model ckpts/HY-Embodied-0.5-X \
     --image ./assets/demo.jpg \
-    --prompt "Describe this image" \
-    --no-thinking
+    --prompt "描述这张图片" \
+    --enable-thinking
 ```
 
 旧入口 `python inference.py ...` 也保留，等价于上面的命令。
@@ -151,10 +149,22 @@ pipe = HyEmbodiedPipeline.from_pretrained(
     torch_dtype=torch.bfloat16,
 )
 
+# 默认：thinking 关闭
 print(pipe.generate(
-    "Describe the image in detail.",
+    "详细描述这张图片。",
     image="./assets/demo.jpg",
     generation_config=GenerationConfig(max_new_tokens=32768, temperature=0.05),
+))
+
+# 启用 thinking 模式
+print(pipe.generate(
+    "详细描述这张图片。",
+    image="./assets/demo.jpg",
+    generation_config=GenerationConfig(
+        max_new_tokens=32768,
+        temperature=0.05,
+        enable_thinking=True,
+    ),
 ))
 ```
 
@@ -184,14 +194,14 @@ from openai import OpenAI
 
 client = OpenAI(base_url="http://localhost:8080/v1", api_key="any")
 
-# 纯文本
+# 纯文本（默认 thinking 关闭）
 resp = client.chat.completions.create(
     model="HY-Embodied-0.5-X",
     messages=[{"role": "user", "content": "如何打开冰箱？"}],
 )
 print(resp.choices[0].message.content)
 
-# 带图片
+# 带图片（默认 thinking 关闭）
 resp = client.chat.completions.create(
     model="HY-Embodied-0.5-X",
     messages=[{
@@ -201,6 +211,13 @@ resp = client.chat.completions.create(
             {"type": "text", "text": "描述这张图片。"},
         ],
     }],
+)
+
+# 启用 thinking 模式（思维链推理）
+resp = client.chat.completions.create(
+    model="HY-Embodied-0.5-X",
+    messages=[{"role": "user", "content": "如何打开冰箱？"}],
+    extra_body={"enable_thinking": True},
 )
 
 # 流式输出
@@ -223,6 +240,15 @@ curl http://localhost:8080/v1/chat/completions \
     "model": "HY-Embodied-0.5-X",
     "messages": [{"role":"user","content":"你好！"}]
   }'
+
+# 启用 thinking 模式
+curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "HY-Embodied-0.5-X",
+    "messages": [{"role":"user","content":"你好！"}],
+    "enable_thinking": true
+  }'
 ```
 
 服务启动后可访问 `/docs` 查看自动生成的 Swagger API 文档。完整服务端文档参见 [`docs/inference.md`](./docs/inference.md)。
@@ -232,15 +258,8 @@ curl http://localhost:8080/v1/chat/completions \
 - **Point**：`(x, y)` 或 `[(x1, y1), (x2, y2)]`
 - **Box**：`[xmin, ymin, xmax, ymax]`
 - 坐标归一化为整数范围 **(0, 1000)**
-- Thinking 模式下响应结构：`<think>[thinking]</think><answer>[answer]</answer>`
-
-## 🎯 适用场景
-
-HY-Embodied-0.5-X 适用于以下具身智能场景：
-
-- **家庭服务 / 桌面操作**：真实环境下的空间推理、精细操作推理、任务理解与失败反思。
-- **任务规划与仿真评测**：仿真环境中的规划评测与多模态交互研究。
-- **本地部署与开发**：端侧具身能力验证与二次开发。
+- **Thinking 模式**（启用后）：响应结构为 `<think>[reasoning]</think><answer>[answer]</answer>`
+- **直接模式**（默认）：响应仅包含答案，无推理部分
 
 ## 🔧 SFT 微调
 
@@ -260,16 +279,10 @@ bash scripts/run_sft_4node_8gpu.sh
 
 仓库内提供两份参考配置：
 
-- `configs/sft/example_small_single_gpu.yaml` — **单卡配置**，禁用
-  DeepSpeed，可直接 `python -m` 启动（无需 `torchrun`），适合快速验证和调试。
-- `configs/sft/example_small.yaml` — **多卡配置**，默认开启 DeepSpeed
-  ZeRO-2，需通过 `torchrun` 或 `accelerate` 启动。训练/优化器相关默认值即为
-  发布训练所用的推荐值；一般情况下新用户**只需要修改
-  `data.train_data_paths` / `data.train_data_sampling_ratios`**，指向自己
-  的 JSONL 数据组合即可。
+- `configs/sft/example_small_single_gpu.yaml` — **单卡配置**，禁用 DeepSpeed，可直接 `python -m` 启动（无需 `torchrun`），适合快速验证和调试。
+- `configs/sft/example_small.yaml` — **多卡配置**，默认开启 DeepSpeed ZeRO-2，需通过 `torchrun` 或 `accelerate` 启动。训练/优化器相关默认值即为发布训练所用的推荐值；一般情况下新用户**只需要修改 `data.train_data_paths` / `data.train_data_sampling_ratios`**，指向自己的 JSONL 数据组合即可。
 
-两份配置均默认使用仓库自带的 `data_examples/data_demo.jsonl`（14 条样本，覆盖
-6 个能力，图像已打包进仓库），因此上述命令可以零外部数据直接跑通。
+两份配置均默认使用仓库自带的 `data_examples/data_demo.jsonl`（14 条样本，覆盖 6 个能力，图像已打包进仓库），因此上述命令可以零外部数据直接跑通。
 
 数据格式、`/think` / `/no_think` 模式、训练/推理差异等详见 [`docs/training.md`](./docs/training.md) 与 [`docs/data_format.md`](./docs/data_format.md)。
 
@@ -305,6 +318,14 @@ HY-Embodied-0.5-X/
 
 详细的模块分层与依赖方向见 [`docs/architecture.md`](./docs/architecture.md)。
 
+## 🎯 适用场景
+
+HY-Embodied-0.5-X 适用于以下具身智能场景：
+
+- **家庭服务 / 桌面操作**：真实环境下的空间推理、精细操作推理、任务理解与失败反思。
+- **任务规划与仿真评测**：仿真环境中的规划评测与多模态交互研究。
+- **本地部署与开发**：端侧具身能力验证与二次开发。
+
 ## 📚 Citation
 
 ```bibtex
@@ -317,4 +338,4 @@ HY-Embodied-0.5-X/
 
 ## 🙏 Acknowledgements
 
-感谢 Hugging Face 社区和所有开源贡献者。HY-Embodied-0.5-X 的开源希望为具身智能社区提供一个更具落地导向的基座选择，推动模型从 “通用理解” 走向 “真实执行”。
+感谢 Hugging Face 社区和所有开源贡献者。HY-Embodied-0.5-X 的开源希望为具身智能社区提供一个更具落地导向的基座选择，推动模型从 "通用理解" 走向 "真实执行"。
