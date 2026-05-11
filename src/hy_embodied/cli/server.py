@@ -280,7 +280,7 @@ def create_app() -> FastAPI:
         pipeline_msgs, temp_files = _openai_messages_to_pipeline(request.messages)
 
         max_tokens = request.max_completion_tokens or request.max_tokens or 32768
-        enable_thinking = request.enable_thinking if request.enable_thinking is not None else True
+        enable_thinking = request.enable_thinking if request.enable_thinking is not None else False
 
         gen_cfg = GenerationConfig(
             max_new_tokens=max_tokens,
