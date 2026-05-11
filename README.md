@@ -180,17 +180,18 @@ the Hub repo id directly, which triggers on-demand download via
 ### Single-image inference
 
 ```bash
+# Default: thinking mode disabled
 python -m hy_embodied.cli.infer \
     --model ckpts/HY-Embodied-0.5-X \
     --image ./assets/demo.jpg \
     --prompt "Describe this image"
 
-# Disable thinking mode
+# Enable thinking mode (chain-of-thought reasoning)
 python -m hy_embodied.cli.infer \
     --model ckpts/HY-Embodied-0.5-X \
     --image ./assets/demo.jpg \
     --prompt "Describe this image" \
-    --no-thinking
+    --enable-thinking
 ```
 
 The legacy `python inference.py ...` invocation also works (it forwards to
@@ -208,10 +209,22 @@ pipe = HyEmbodiedPipeline.from_pretrained(
     torch_dtype=torch.bfloat16,
 )
 
+# Default: thinking disabled
 print(pipe.generate(
     "Describe the image in detail.",
     image="./assets/demo.jpg",
     generation_config=GenerationConfig(max_new_tokens=32768, temperature=0.05),
+))
+
+# Enable thinking mode
+print(pipe.generate(
+    "Describe the image in detail.",
+    image="./assets/demo.jpg",
+    generation_config=GenerationConfig(
+        max_new_tokens=32768,
+        temperature=0.05,
+        enable_thinking=True,
+    ),
 ))
 ```
 
@@ -242,14 +255,14 @@ from openai import OpenAI
 
 client = OpenAI(base_url="http://localhost:8080/v1", api_key="any")
 
-# Text-only
+# Text-only (thinking disabled by default)
 resp = client.chat.completions.create(
     model="HY-Embodied-0.5-X",
     messages=[{"role": "user", "content": "How to open a fridge?"}],
 )
 print(resp.choices[0].message.content)
 
-# With image
+# With image (thinking disabled by default)
 resp = client.chat.completions.create(
     model="HY-Embodied-0.5-X",
     messages=[{
@@ -259,6 +272,13 @@ resp = client.chat.completions.create(
             {"type": "text", "text": "Describe this image."},
         ],
     }],
+)
+
+# Enable thinking mode (chain-of-thought reasoning)
+resp = client.chat.completions.create(
+    model="HY-Embodied-0.5-X",
+    messages=[{"role": "user", "content": "How to open a fridge?"}],
+    extra_body={"enable_thinking": True},
 )
 
 # Streaming
@@ -280,6 +300,15 @@ curl http://localhost:8080/v1/chat/completions \
   -d '{
     "model": "HY-Embodied-0.5-X",
     "messages": [{"role":"user","content":"Hello!"}]
+  }'
+
+# Enable thinking mode
+curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "HY-Embodied-0.5-X",
+    "messages": [{"role":"user","content":"Hello!"}],
+    "enable_thinking": true
   }'
 ```
 
@@ -324,8 +353,10 @@ distributed strategies.
 - **Point**: `(x, y)` or `[(x1, y1), (x2, y2)]`
 - **Box**: `[xmin, ymin, xmax, ymax]`
 - Coordinates are normalized to the integer range **(0, 1000)**.
-- In thinking mode, the response is structured as
+- **Thinking mode** (when enabled): The response is structured as
   `<think>[reasoning]</think><answer>[answer]</answer>`.
+- **Direct mode** (default): The response contains only the answer without
+  a reasoning section.
 
 ## 📁 Repository Layout
 
