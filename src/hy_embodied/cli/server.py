@@ -184,7 +184,12 @@ def _openai_messages_to_pipeline(messages: list[ChatMessage]) -> tuple[list[dict
 
     for msg in messages:
         if isinstance(msg.content, str):
-            pipeline_msgs.append({"role": msg.role, "content": [{"type": "text", "text": msg.content}]})
+            # For system messages, keep content as string (not a list)
+            # Other roles (user, assistant) use list format
+            if msg.role == "system":
+                pipeline_msgs.append({"role": msg.role, "content": msg.content})
+            else:
+                pipeline_msgs.append({"role": msg.role, "content": [{"type": "text", "text": msg.content}]})
         else:
             content_parts: list[dict] = []
             for part in msg.content:
