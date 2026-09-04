@@ -23,9 +23,9 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import torch
 from transformers import AutoModelForImageTextToText, AutoProcessor
@@ -76,7 +76,7 @@ class HyEmbodiedPipeline:
         device: str = "cuda",
         torch_dtype: torch.dtype = torch.bfloat16,
         attn_implementation: str | None = None,
-    ) -> "HyEmbodiedPipeline":
+    ) -> HyEmbodiedPipeline:
         """Load processor + model from a local directory or HF Hub repo id."""
         logger.info("Loading processor from %s", model_path)
         processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=False)
@@ -111,10 +111,20 @@ class HyEmbodiedPipeline:
         """Build a single-turn user message from the given inputs.
 
         Only one of ``image`` / ``images`` / ``video`` should be provided.
+        Passing more than one raises :class:`ValueError`.
         """
+        provided = sum(x is not None for x in (image, images, video))
+        if provided > 1:
+            raise ValueError(
+                f"Only one of image / images / video may be provided, but got {provided} non-None arguments."
+            )
+
         content: list[dict] = []
         if images is not None:
-            for img in images:
+            images_list = list(images)
+            if not images_list:
+                raise ValueError("'images' is empty; pass None instead or provide at least one image.")
+            for img in images_list:
                 content.append({"type": "image", "image": img})
         elif image is not None:
             content.append({"type": "image", "image": image})
@@ -154,7 +164,7 @@ class HyEmbodiedPipeline:
             temperature=cfg.temperature,
             do_sample=cfg.temperature > 0,
         )
-        output_ids = [out[len(inp):] for inp, out in zip(inputs.input_ids, generated_ids)]
+        output_ids = [out[len(inp) :] for inp, out in zip(inputs.input_ids, generated_ids, strict=False)]
         return self.processor.batch_decode(
             output_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )[0]
